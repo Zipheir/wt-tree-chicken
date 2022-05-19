@@ -303,11 +303,11 @@
     (if (or (< index 0)
             (>= index bound)
             (not (fix:fixnum? index)))
-      (error 'bad-range-argument index 'node/index)
+      (error 'node/index "bad range argument" index)
       (loop node index))))
 
 (define (error:empty owner)
-  (error "Operation requires non-empty tree:" owner))
+  (error owner "Operation requires non-empty tree"))
 
 (define (local:make-wt-tree-type key<?)
 
@@ -518,7 +518,7 @@
             ((pair? alist)  (loop (cdr alist)
                                   (node/add node (caar alist) (cdar alist))))
             (else
-              (error 'wrong-type-argument alist "alist" 'alist->tree))))
+              (error 'alist->tree "wrong type argument" alist))))
     (%make-wt-tree my-type (loop alist empty)))
 
   (define (tree/get tree key default)
@@ -559,20 +559,21 @@
 
 (define (guarantee-tree tree procedure)
   (if (not (wt-tree? tree))
-    (error 'wrong-type-argument
-                tree "weight-balanced tree" procedure)))
+    (error "wrong type argument" tree procedure)))
 
 (define (guarantee-tree-type type procedure)
   (if (not (tree-type? type))
-    (error 'wrong-type-argument
-                type "weight-balanced tree type" procedure)))
+    (error "wrong type argument" type procedure)))
 
 (define (guarantee-compatible-trees tree1 tree2 procedure)
   (guarantee-tree tree1 procedure)
   (guarantee-tree tree2 procedure)
   (if (not (eq? (tree/type tree1) (tree/type tree2)))
-    (error "The trees" tree1 'and tree2 'have 'incompatible 'types
-                (tree/type tree1) 'and (tree/type tree2))))
+    (error "trees have incompatible types"
+           tree1
+           tree2
+           (tree/type tree1)
+           (tree/type tree2))))
 
 (define (valid? tree)
   (let ((root (tree/root tree)))
