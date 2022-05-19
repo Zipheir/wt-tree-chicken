@@ -557,23 +557,36 @@
 
   my-type)
 
-(define (guarantee-tree tree procedure)
-  (if (not (wt-tree? tree))
-    (error "wrong type argument" tree procedure)))
+;;; Type checking forms
 
-(define (guarantee-tree-type type procedure)
-  (if (not (tree-type? type))
-    (error "wrong type argument" type procedure)))
+(define-syntax guarantee-tree
+  (syntax-rules ()
+    ((guarantee-tree tree procedure)
+     (assert (wt-tree? tree)
+             "wrong type argument"
+             tree
+             procedure))))
 
-(define (guarantee-compatible-trees tree1 tree2 procedure)
-  (guarantee-tree tree1 procedure)
-  (guarantee-tree tree2 procedure)
-  (if (not (eq? (tree/type tree1) (tree/type tree2)))
-    (error "trees have incompatible types"
-           tree1
-           tree2
-           (tree/type tree1)
-           (tree/type tree2))))
+(define-syntax guarantee-tree-type
+  (syntax-rules ()
+    ((guarantee-tree-type type procedure)
+     (assert (tree-type? type)
+             "wrong type argument"
+             type
+             procedure))))
+
+(define-syntax guarantee-compatible-trees
+  (syntax-rules ()
+    ((guarantee-compatible-trees tree1 tree2 procedure)
+     (begin
+      (guarantee-tree tree1 procedure)
+      (guarantee-tree tree2 procedure)
+      (assert (eq? (tree/type tree1) (tree/type tree2))
+              "trees have incompatible types"
+              tree1
+              tree2
+              (tree/type tree1)
+              (tree/type tree2))))))
 
 (define (valid? tree)
   (let ((root (tree/root tree)))
