@@ -71,98 +71,42 @@
 ;;  A TREE-TYPE is a collection of those procedures that depend on the
 ;;  ordering relation.
 
-;; MIT-Scheme structure definition
-;;(define-structure
-;;    (tree-type
-;;     (conc-name tree-type/)
-;;     (constructor %make-tree-type))
-;;  (key<?       #F read-only true)
-;;  (alist->tree #F read-only true)
-;;  (add         #F read-only true)
-;;  (insert!     #F read-only true)
-;;  (delete      #F read-only true)
-;;  (delete!     #F read-only true)
-;;  (member?     #F read-only true)
-;;  (lookup      #F read-only true)
-;;  (split-lt    #F read-only true)
-;;  (split-gt    #F read-only true)
-;;  (union       #F read-only true)
-;;  (union-merge #F read-only true)
-;;  (intersection #F read-only true)
-;;  (difference  #F read-only true)
-;;  (subset?     #F read-only true)
-;;  (rank        #F read-only true)
-;;)
-
-;; Written out by hand, using vectors:
-;;
-;; If possible, you should teach your system to print out something
-;; like #[tree-type <] instread of the whole vector.
-
-(define tag:tree-type (string->symbol "#[(runtime wttree)tree-type]"))
-
-(define (%make-tree-type key<?       alist->tree
-                         add         insert!
-                         delete      delete!
-                         member?     lookup
-                         split-lt    split-gt
-                         union       union-merge
-                         intersection difference
-                         subset?     rank        )
-  (vector tag:tree-type
-          key<?       alist->tree   add         insert!
-          delete      delete!       member?     lookup
-          split-lt    split-gt      union       union-merge
-          intersection difference   subset?     rank        ))
-
-(define (tree-type? tt)
-  (and (vector? tt)
-       (eq? (vector-ref tt 0) tag:tree-type)))
-
-(define (tree-type/key<?        tt) (vector-ref tt 1))
-(define (tree-type/alist->tree  tt) (vector-ref tt 2))
-(define (tree-type/add          tt) (vector-ref tt 3))
-(define (tree-type/insert!      tt) (vector-ref tt 4))
-(define (tree-type/delete       tt) (vector-ref tt 5))
-(define (tree-type/delete!      tt) (vector-ref tt 6))
-(define (tree-type/member?      tt) (vector-ref tt 7))
-(define (tree-type/lookup       tt) (vector-ref tt 8))
-(define (tree-type/split-lt     tt) (vector-ref tt 9))
-(define (tree-type/split-gt     tt) (vector-ref tt 10))
-(define (tree-type/union        tt) (vector-ref tt 11))
-(define (tree-type/union-merge  tt) (vector-ref tt 12))
-(define (tree-type/intersection tt) (vector-ref tt 13))
-(define (tree-type/difference   tt) (vector-ref tt 14))
-(define (tree-type/subset?      tt) (vector-ref tt 15))
-(define (tree-type/rank         tt) (vector-ref tt 16))
+(define-record-type tree-type
+  (%make-tree-type key<?       alist->tree
+                   add         insert!
+                   delete      delete!
+                   member?     lookup
+                   split-lt    split-gt
+                   union       union-merge
+                   intersection difference
+                   subset?     rank        )
+  tree-type?
+  (key<? tree-type/key<?)
+  (alist->tree tree-type/alist->tree)
+  (add tree-type/add)
+  (insert! tree-type/insert!)
+  (delete tree-type/delete)
+  (delete! tree-type/delete!)
+  (member? tree-type/member?)
+  (lookup tree-type/lookup)
+  (split-lt tree-type/split-lt)
+  (split-gt tree-type/split-gt)
+  (union tree-type/union)
+  (union-merge tree-type/union-merge)
+  (intersection tree-type/intersection)
+  (difference tree-type/difference)
+  (subset? tree-type/subset?)
+  (rank tree-type/rank))
 
 ;;  User level tree representation.
 ;;
 ;;  WT-TREE is a wrapper for trees of nodes.
-;;
-;;MIT-Scheme:
-;;(define-structure
-;;    (wt-tree
-;;     (conc-name tree/)
-;;     (constructor %make-wt-tree))
-;;  (type  #F read-only true)
-;;  (root  #F read-only false))
 
-;; If possible, you should teach your system to print out something
-;; like #[wt-tree] instread of the whole vector.
-
-(define tag:wt-tree (string->symbol "#[(runtime wttree)wt-tree]"))
-
-(define (%make-wt-tree type root)
-  (vector tag:wt-tree type root))
-
-(define (wt-tree? t)
-  (and (vector? t)
-       (eq? (vector-ref t 0) tag:wt-tree)))
-
-(define (tree/type t) (vector-ref t 1))
-(define (tree/root t) (vector-ref t 2))
-(define (set-tree/root! t v) (vector-set! t 2 v))
+(define-record-type wt-tree
+  (%make-wt-tree type root)
+  wt-tree?
+  (type tree/type)
+  (root tree/root set-tree/root!))
 
 ;;  Nodes are the thing from which the real trees are built.  There are
 ;;  lots of these and the uninquisitive user will never see them, so
