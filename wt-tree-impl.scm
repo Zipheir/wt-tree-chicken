@@ -28,6 +28,7 @@
 ;;;
 ;;;
 ;;; Packaged for R7RS Scheme by Peter Lane, 2017
+;;; Ported to CHICKEN 5 Scheme by Wolfgang Corcoran-Mathe 2022
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
