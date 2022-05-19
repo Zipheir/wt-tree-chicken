@@ -59,18 +59,13 @@
 ;;; (re)defined in your system.
 ;;;
 
-;; We use the folowing MIT-Scheme operation on fixnums (small
-;; integers).  R4RS compatible (but less efficient) definitions.
-;; You should replace these with something that is efficient in your
-;; system.
-
-(define fix:fixnum? (lambda (x) (and (exact? x) (integer? x))))
-(define fix:+ +)
-(define fix:- -)
-(define fix:< <)
-(define fix:<= <=)
-(define fix:> >)
-(define fix:* *)
+(define fix:fixnum? fixnum?)
+(define fix:+ fx+)
+(define fix:- fx-)
+(define fix:< fx<)
+(define fix:<= fx<=)
+(define fix:> fx>)
+(define fix:* fx*)
 
 ;;  A TREE-TYPE is a collection of those procedures that depend on the
 ;;  ordering relation.

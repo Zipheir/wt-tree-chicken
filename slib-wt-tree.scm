@@ -36,6 +36,7 @@
 
   (import scheme
           (chicken base)
+          (chicken fixnum)
           )
 
   (include "wt-tree-impl.scm")
