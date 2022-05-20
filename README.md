@@ -7,7 +7,7 @@ MIT Scheme to CHICKEN 5 Scheme.
 
 The R4RS version of this library is the work of Stephen Adams and
 was, I think, adapted from the MIT Scheme version, also by Adams.
-Peter Lane made some R7RS adaptions in 2017.
+Peter Lane made some R7RS adaptations in 2017.
 
 This version of the library was adapted for CHICKEN by
 Wolfgang Corcoran-Mathe.
