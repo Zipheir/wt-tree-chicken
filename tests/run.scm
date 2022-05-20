@@ -69,7 +69,34 @@
           (equal? (map cdr ps)
                   (map (lambda (p)
                          (wt-tree/lookup tree (car p) #f))
-                       ps))))))
+                       ps)))
+        (test 'frob
+              (wt-tree/lookup (wt-tree/delete tree x)
+                              x
+                              'frob)))))
+  )
+
+(test-group "Advanced wt-trees"
+  (test-generative ((ps (lambda () (make-random-nat-alist size-bound)))
+                    (x random-nat-elt))
+    (let ((tree (alist->wt-tree number-wt-type ps)))
+      (receive (in out) (partition (lambda (p) (< (car p) x)) ps)
+        (let ((t (wt-tree/split< tree x)))
+          (test "members of split< trees"
+                #t
+                (every (lambda (p) (wt-tree/member? (car p) t)) in))
+          (test "non-members of split< trees"
+                #f
+                (any (lambda (p) (wt-tree/member? (car p) t)) out))))
+
+      (receive (in out) (partition (lambda (p) (> (car p) x)) ps)
+        (let ((t (wt-tree/split> tree x)))
+          (test "members of split> trees"
+                #t
+                (every (lambda (p) (wt-tree/member? (car p) t)) in))
+          (test "non-members of split> trees"
+                #f
+                (any (lambda (p) (wt-tree/member? (car p) t)) out))))))
   )
 
 (test-exit)
