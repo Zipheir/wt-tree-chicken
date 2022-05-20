@@ -1,0 +1,8 @@
+((author "Stephen Adams"
+ (maintainer "Wolfgang Corcoran-Mathe")
+ (synopsis "Weight-balanced trees")
+ (version "0.1")
+ (category data)
+ (license "GPLv2")
+ (test-dependencies test test-generative srfi-1)
+ (components (extension (slib wt-tree)))))
