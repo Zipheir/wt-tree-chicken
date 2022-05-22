@@ -104,7 +104,7 @@
 ;;
 ;;  WT-TREE is a wrapper for trees of nodes.
 
-(define-type node vector)
+(define-type node (struct node))
 
 (define-record-type wt-tree
   (%make-wt-tree type root)
@@ -120,12 +120,14 @@
 ;;  used for tagging structures.
 ;;  In MIT-Scheme these were all DEFINE-INTEGRABLE
 
-(define (make-node k v l r w) (vector w l k r v))
-(define (node/k node) (vector-ref node 2))
-(define (node/v node) (vector-ref node 4))
-(define (node/l node) (vector-ref node 1))
-(define (node/r node) (vector-ref node 3))
-(define (node/w node) (vector-ref node 0))
+(define-record-type node
+  (make-node k v l r w)
+  node?
+  (k node/k : *)
+  (v node/v : *)
+  (l node/l : (or symbol node))
+  (r node/r : (or symbol node))
+  (w node/w : integer))
 
 (define empty  'empty)
 (define (empty? x) (eq? x 'empty))
