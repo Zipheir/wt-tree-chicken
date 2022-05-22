@@ -97,6 +97,63 @@
           (test "non-members of split> trees"
                 #f
                 (any (lambda (p) (wt-tree/member? (car p) t)) out))))))
+
+  (test-generative ((ps1 (lambda () (make-random-nat-alist size-bound)))
+                    (ps2 (lambda () (make-random-nat-alist size-bound))))
+    (let ((tree1 (alist->wt-tree number-wt-type ps1))
+          (tree2 (alist->wt-tree number-wt-type ps2)))
+      ;; union
+      (let ((tu (wt-tree/union tree1 tree2)))
+        (test "members of union trees"
+              #t
+              (and (every (lambda (p) (wt-tree/member? (car p) tu)) ps1)
+                   (every (lambda (p) (wt-tree/member? (car p) tu)) ps2))))
+      ;; intersection
+      (let ((ti (wt-tree/intersection tree1 tree2))
+            (psi (lset-intersection (lambda (p q)
+                                      (= (car p) (car q)))
+                                    ps1
+                                    ps2)))
+        (test "members of intersection trees"
+              #t
+              (every (lambda (p) (wt-tree/member? (car p) ti)) psi)))
+      ;; difference
+      (let ((ti (wt-tree/difference tree1 tree2))
+            (psd (lset-difference (lambda (p q)
+                                    (= (car p) (car q)))
+                                  ps1
+                                  ps2)))
+        (test "members of difference trees"
+              #t
+              (every (lambda (p) (wt-tree/member? (car p) ti)) psd)))))
+
+  ;; subset? and set-equal?
+  (let ((empty (make-wt-tree number-wt-type)))
+    (test-generative ((ps1 (lambda ()
+                             (make-random-nat-alist size-bound)))
+                      (ps2-temp (lambda ()
+                                  (make-random-nat-alist size-bound))))
+      (let ((t1 (alist->wt-tree number-wt-type ps1))
+            (t-sub (alist->wt-tree number-wt-type
+                                   (take ps1 (quotient (length ps1) 2))))
+            (t-disj (alist->wt-tree
+                     number-wt-type
+                     (remove (lambda (p) (assv (car p) ps1))
+                         ps2-temp))))
+        (test #t (wt-tree/subset? t1 t1))
+        (test #t (wt-tree/subset? t-sub t1))
+        (test #t (wt-tree/subset? empty t1))
+        (test "wt-tree/subset? of disjoint trees"
+              #t
+              (or (= 0 (wt-tree/size t1) (wt-tree/size t-disj))
+                  (not (wt-tree/subset? t1 t-disj))))
+        (test #t (wt-tree/subset? t1 (wt-tree/union t1 t-disj)))
+        (test #t (wt-tree/set-equal? t1 t1))
+        (test #f (wt-tree/set-equal? t1 empty))
+        (test "wt-tree/set-equal? of disjoint trees"
+              #t
+              (or (= 0 (wt-tree/size t1) (wt-tree/size t-disj))
+                  (not (wt-tree/set-equal? t1 t-disj)))))))
   )
 
 (test-exit)
