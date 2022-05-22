@@ -156,4 +156,33 @@
                   (not (wt-tree/set-equal? t1 t-disj)))))))
   )
 
+;; TODO: More tests for wt-tree/for-each.
+(test-group "iteration"
+  (test-generative ((ps (lambda ()
+                          (remove-key-dups
+                           (make-random-nat-alist size-bound)))))
+    (let ((t (alist->wt-tree number-wt-type ps)))
+      (test "wt-tree/fold empty"
+            'z
+            (wt-tree/fold append 'z (make-wt-tree number-wt-type)))
+      ; bignums!
+      (test "wt-tree/fold non-empty"
+            #t
+            (= (fold (lambda (p k) (+ (car p) (cdr p) k)) 0 ps)
+               (wt-tree/fold + 0 t)))
+      (test "wt-tree/fold alist conv"
+            #t
+            (lset= equal?
+                   ps
+                   (wt-tree/fold (lambda (k v qs) (cons (cons k v) qs))
+                                 '()
+                                 t)))
+      (let ((n 0))
+        (test "wt-tree/for-each counting"
+              (wt-tree/size t)
+              (begin
+               (wt-tree/for-each (lambda (_k _v) (set! n (+ n 1))) t)
+               n)))))
+  )
+
 (test-exit)
