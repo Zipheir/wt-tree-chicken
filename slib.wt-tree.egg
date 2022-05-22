@@ -5,4 +5,7 @@
  (category data)
  (license "GPLv2")
  (test-dependencies test test-generative srfi-1)
- (components (extension slib.wt-tree)))
+ (components
+  (extension
+   slib.wt-tree
+   (types-file))))

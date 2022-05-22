@@ -98,15 +98,21 @@
   (subset? tree-type/subset?)
   (rank tree-type/rank))
 
+(define-type wt-tree-type (struct tree-type))
+
 ;;  User level tree representation.
 ;;
 ;;  WT-TREE is a wrapper for trees of nodes.
 
+(define-type node vector)
+
 (define-record-type wt-tree
   (%make-wt-tree type root)
   wt-tree?
-  (type tree/type)
-  (root tree/root set-tree/root!))
+  (type tree/type : wt-tree-type)
+  (root tree/root set-tree/root! : node))
+
+(define-type wt-tree (struct wt-tree))
 
 ;;  Nodes are the thing from which the real trees are built.  There are
 ;;  lots of these and the uninquisitive user will never see them, so
@@ -563,102 +569,123 @@
 ;;;
 ;;;  Export interface
 ;;;
+(: make-wt-tree-type (procedure -> tree-type))
 (define make-wt-tree-type local:make-wt-tree-type)
 
+(: make-wt-tree (wt-tree-type -> wt-tree))
 (define make-wt-tree
   (lambda (tree-type)
     (%make-wt-tree tree-type empty)))
 
+(: singleton-wt-tree (wt-tree-type * * -> wt-tree))
 (define singleton-wt-tree
   (lambda (type key value)
     (guarantee-tree-type type 'singleton-wt-tree)
     (%make-wt-tree type (node/singleton key value))))
 
+(: alist-wt-tree (wt-tree-type list -> wt-tree))
 (define alist->wt-tree
   (lambda (type alist)
     (guarantee-tree-type type 'alist->wt-tree)
     ((tree-type/alist->tree type) alist)))
 
+(: wt-tree/empty? (wt-tree -> boolean))
 (define wt-tree/empty?
   (lambda (tree)
     (guarantee-tree tree 'wt-tree/empty?)
     (empty? (tree/root tree))))
 
+(: wt-tree/size (wt-tree -> integer))
 (define wt-tree/size
   (lambda (tree)
     (guarantee-tree tree 'wt-tree/size)
     (node/size (tree/root tree))))
 
+(: wt-tree/add (wt-tree * * -> wt-tree))
 (define wt-tree/add
   (lambda (tree key datum)
     (guarantee-tree tree 'wt-tree/add)
     ((tree-type/add (tree/type tree)) tree key datum)))
 
+(: wt-tree/delete (wt-tree * -> wt-tree))
 (define wt-tree/delete
   (lambda (tree key)
     (guarantee-tree tree 'wt-tree/delete)
     ((tree-type/delete (tree/type tree)) tree key)))
 
+(: wt-tree/add! (wt-tree * * -> undefined))
 (define wt-tree/add!
   (lambda (tree key datum)
     (guarantee-tree tree 'wt-tree/add!)
     ((tree-type/insert! (tree/type tree)) tree key datum)))
 
+(: wt-tree/delete! (wt-tree * -> undefined))
 (define wt-tree/delete!
   (lambda (tree key)
     (guarantee-tree tree 'wt-tree/delete!)
     ((tree-type/delete! (tree/type tree)) tree key)))
 
+(: wt-tree/member? (* wt-tree -> boolean))
 (define wt-tree/member?
   (lambda (key tree)
     (guarantee-tree tree 'wt-tree/member?)
     ((tree-type/member? (tree/type tree)) key tree)))
 
+(: wt-tree/lookup (wt-tree * * -> *))
 (define wt-tree/lookup
   (lambda (tree key default)
     (guarantee-tree tree 'wt-tree/lookup)
     ((tree-type/lookup (tree/type tree)) tree key default)))
 
+(: wt-tree/split< (wt-tree * -> wt-tree))
 (define wt-tree/split<
   (lambda (tree key)
     (guarantee-tree tree 'wt-tree/split<)
     ((tree-type/split-lt (tree/type tree)) tree key)))
 
+(: wt-tree/split> (wt-tree * -> wt-tree))
 (define wt-tree/split>
   (lambda (tree key)
     (guarantee-tree tree 'wt-tree/split>)
     ((tree-type/split-gt (tree/type tree)) tree key)))
 
+(: wt-tree/union (wt-tree wt-tree -> wt-tree))
 (define wt-tree/union
   (lambda (tree1 tree2)
     (guarantee-compatible-trees tree1 tree2 'wt-tree/union)
     ((tree-type/union (tree/type tree1)) tree1 tree2)))
 
+(: wt-tree/union-merge (wt-tree wt-tree (* * * -> *) -> wt-tree))
 (define wt-tree/union-merge
   (lambda (tree1 tree2 merge)
     (guarantee-compatible-trees tree1 tree2 'wt-tree/union-merge)
     ((tree-type/union-merge (tree/type tree1)) tree1 tree2 merge)))
 
+(: wt-tree/intersection (wt-tree wt-tree -> wt-tree))
 (define wt-tree/intersection
   (lambda (tree1 tree2)
     (guarantee-compatible-trees tree1 tree2 'wt-tree/intersection)
     ((tree-type/intersection (tree/type tree1)) tree1 tree2)))
 
+(: wt-tree/difference (wt-tree wt-tree -> wt-tree))
 (define wt-tree/difference
   (lambda (tree1 tree2)
     (guarantee-compatible-trees tree1 tree2 'wt-tree/difference)
     ((tree-type/difference (tree/type tree1)) tree1 tree2)))
 
+(: wt-tree/subset? (wt-tree wt-tree -> boolean))
 (define wt-tree/subset?
   (lambda (tree1 tree2)
     (guarantee-compatible-trees tree1 tree2 'wt-tree/subset?)
     ((tree-type/subset? (tree/type tree1)) tree1 tree2)))
 
+(: wt-tree/set-equal? (wt-tree wt-tree -> boolean))
 (define wt-tree/set-equal?
   (lambda (tree1 tree2)
     (and (wt-tree/subset? tree1 tree2)
          (wt-tree/subset? tree2 tree1))))
 
+(: wt-tree/fold ((* * * -> *) * wt-tree -> *))
 (define wt-tree/fold
   (lambda (combiner-key-datum-result init tree)
     (guarantee-tree tree 'wt-tree/fold)
@@ -666,23 +693,27 @@
                        init
                        (tree/root tree))))
 
+(: wt-tree/for-each ((* * -> *) wt-tree -> undefined))
 (define wt-tree/for-each
   (lambda (action-key-datum tree)
     (guarantee-tree tree 'wt-tree/for-each)
     (node/for-each action-key-datum (tree/root tree))))
 
+(: wt-tree/index (wt-tree integer -> *))
 (define wt-tree/index
   (lambda (tree index)
     (guarantee-tree tree 'wt-tree/index)
     (let ((node  (node/index (tree/root tree) index)))
       (and node (node/k node)))))
 
+(: wt-tree/index-datum (wt-tree integer -> *))
 (define wt-tree/index-datum
   (lambda (tree index)
     (guarantee-tree tree 'wt-tree/index-datum)
     (let ((node  (node/index (tree/root tree) index)))
       (and node (node/v node)))))
 
+(: wt-tree/index-pair (wt-tree integer -> pair))
 (define wt-tree/index-pair
   (lambda (tree index)
     (guarantee-tree tree 'wt-tree/index-pair)
