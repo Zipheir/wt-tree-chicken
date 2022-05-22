@@ -110,7 +110,7 @@
   (%make-wt-tree type root)
   wt-tree?
   (type tree/type : wt-tree-type)
-  (root tree/root set-tree/root! : node))
+  (root tree/root set-tree/root! : (or symbol node)))
 
 (define-type wt-tree (struct wt-tree))
 
@@ -571,7 +571,7 @@
 ;;;
 ;;;  Export interface
 ;;;
-(: make-wt-tree-type (procedure -> tree-type))
+(: make-wt-tree-type (procedure -> wt-tree-type))
 (define make-wt-tree-type local:make-wt-tree-type)
 
 (: make-wt-tree (wt-tree-type -> wt-tree))
