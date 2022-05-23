@@ -11,6 +11,12 @@
 (define (random-nat-elt)
   (pseudo-random-integer elt-bound))
 
+(define (random-nonzero-size)
+  (let loop ((k (pseudo-random-integer size-bound)))
+    (if (zero? k)
+        (loop (pseudo-random-integer size-bound))
+        k)))
+
 ;; These may contain duplicates.
 (define (make-random-nat-alist size)
   (list-tabulate size
@@ -26,6 +32,16 @@
               (remove-key-dups
                (remove (lambda (p) (eqv? key (car p)))
                        (cdr ps)))))))
+
+;; Return the pair of ps with the least key.
+(define (alist-min ps)
+  (letrec
+   ((search
+     (lambda (ps least)
+       (cond ((null? ps) least)
+             ((< (caar ps) (car least)) (search (cdr ps) (car ps)))
+             (else (search (cdr ps) least))))))
+     (search (cdr ps) (car ps))))
 
 (define (make-random-wt-tree size)
   (alist->wt-tree number-wt-type
@@ -184,5 +200,25 @@
                (wt-tree/for-each (lambda (_k _v) (set! n (+ n 1))) t)
                n)))))
   )
+
+(test-group "min/max"
+  (test-generative ((size random-nonzero-size))
+    (let* ((ps (remove-key-dups (make-random-nat-alist size)))
+           (t (alist->wt-tree number-wt-type ps))
+           (min-p (alist-min ps)))
+      (test "wt-tree/min" (car min-p) (wt-tree/min t))
+      (test "wt-tree/min-datum" (cdr min-p) (wt-tree/min-datum t))
+      (test "wt-tree/min-pair" min-p (wt-tree/min-pair t))
+
+      (test "wt-tree/delete-min no min"
+            #f
+            (wt-tree/member? (car min-p) (wt-tree/delete-min t)))
+      (test "wt-tree/delete-min rest"
+            #t
+            (every (lambda (p)
+                     (or (= (car p) (car min-p)) ; min assoc deleted
+                         (= (cdr p) (wt-tree/lookup t (car p) #f))))
+                   ps))
+  )))
 
 (test-exit)
