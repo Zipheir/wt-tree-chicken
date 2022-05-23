@@ -722,33 +722,39 @@
     (let ((node  (node/index (tree/root tree) index)))
       (and node (cons (node/k node) (node/v node))))))
 
+(: wt-tree/rank (wt-tree * -> (or integer false)))
 (define wt-tree/rank
   (lambda (tree key)
     (guarantee-tree tree 'wt-tree/rank)
     ((tree-type/rank (tree/type tree)) tree key)))
 
+(: wt-tree/min (wt-tree -> *))
 (define wt-tree/min
   (lambda (tree)
     (guarantee-tree tree 'wt-tree/min)
     (node/k (node/min (tree/root tree)))))
 
+(: wt-tree/min-datum (wt-tree -> *))
 (define wt-tree/min-datum
   (lambda (tree)
     (guarantee-tree tree 'wt-tree/min-datum)
     (node/v (node/min (tree/root tree)))))
 
+(: wt-tree/min (wt-tree -> pair))
 (define wt-tree/min-pair
   (lambda (tree)
     (guarantee-tree tree 'wt-tree/min-pair)
     (let ((node  (node/min (tree/root tree))))
       (cons (node/k node) (node/v node)))))
 
+(: wt-tree/delete-min (wt-tree -> wt-tree))
 (define wt-tree/delete-min
   (lambda (tree)
     (guarantee-tree tree 'wt-tree/delete-min)
     (%make-wt-tree (tree/type tree)
                    (node/delmin (tree/root tree)))))
 
+(: wt-tree/delete-min! (wt-tree -> undefined))
 (define wt-tree/delete-min!
   (lambda (tree)
     (guarantee-tree tree 'wt-tree/delete-min!)
@@ -756,7 +762,9 @@
 
 ;; < is a lexpr. Many compilers can open-code < so the lambda is faster
 ;; than passing <.
+(: number-wt-type wt-tree-type)
 (define number-wt-type (local:make-wt-tree-type  (lambda (u v) (< u v))))
+(: string-wt-type wt-tree-type)
 (define string-wt-type (local:make-wt-tree-type  string<?))
 
 (define wt-tree/valid?
