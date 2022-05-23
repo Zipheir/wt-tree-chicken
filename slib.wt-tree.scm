@@ -32,7 +32,7 @@
    wt-tree/min-pair
    wt-tree/delete-min
    wt-tree/delete-min!
-   wt-tree/valid?)
+   )
 
   (import scheme
           (chicken base)
