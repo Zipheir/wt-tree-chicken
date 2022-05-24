@@ -201,7 +201,7 @@
                n)))))
   )
 
-(test-group "min/max"
+(test-group "min / delete-min"
   (test-generative ((size random-nonzero-size))
     (let* ((ps (remove-key-dups (make-random-nat-alist size)))
            (t (alist->wt-tree number-wt-type ps))
