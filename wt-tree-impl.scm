@@ -80,7 +80,7 @@
                    union       union-merge
                    intersection difference
                    subset?     rank        )
-  tree-type?
+  wt-tree-type?
   (key<? tree-type/key<?)
   (alist->tree tree-type/alist->tree)
   (add tree-type/add)
@@ -519,7 +519,7 @@
 (define-syntax guarantee-tree-type
   (syntax-rules ()
     ((guarantee-tree-type type procedure)
-     (assert (tree-type? type)
+     (assert (wt-tree-type? type)
              "wrong type argument"
              type
              procedure))))

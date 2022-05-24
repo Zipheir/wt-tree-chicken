@@ -51,7 +51,8 @@
   (test-assert (wt-tree/empty? (make-wt-tree number-wt-type)))
 
   (test-generative ((tree (lambda () (make-random-wt-tree 10))))
-    (test-assert (not (wt-tree/empty? tree))))
+    (test-assert (not (wt-tree/empty? tree)))
+    (test-assert (wt-tree? tree)))
 
   (test-generative ((x random-nat-elt))
     (test 1 (wt-tree/size (singleton-wt-tree number-wt-type x x)))

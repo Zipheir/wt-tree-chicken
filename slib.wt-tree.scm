@@ -1,10 +1,12 @@
 (module (slib wt-tree)
   (make-wt-tree-type
+   wt-tree-type?
    number-wt-type
    string-wt-type
    make-wt-tree
    singleton-wt-tree
    alist->wt-tree
+   wt-tree?
    wt-tree/empty?
    wt-tree/size
    wt-tree/add
