@@ -265,20 +265,17 @@
 
   (define (key>? x y)  (key<? y x))
 
-  (define node/find ; rewritten to avoid internal loop, to compile with Kawa
-    (case-lambda
-      ((k node)
-       (node/find k node #f))
-      ((k node best)
-       (cond ((empty? node)
-              (if (or (not best)
-                      (key<? (node/k best) k))
-                #f
-                best))
-             ((key<? k (node/k node))
-              (node/find k (node/l node) best))
-             (else
-               (node/find k (node/r node) node))))))
+  (define (node/find k node)
+    (let search ((node node) (best #f))
+      (cond ((empty? node)
+             (if (or (not best)
+                     (key<? (node/k best) k))
+                 #f
+                 best))
+            ((key<? k (node/k node))
+             (search (node/l node) best))
+            (else
+             (search (node/r node) node)))))
 
   (define (node/rank k node rank)
     (cond ((empty? node)             #f)
