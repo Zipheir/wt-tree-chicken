@@ -1,4 +1,5 @@
 (import (chicken random)
+        (chicken sort)
         (srfi 1)
         test
         test-generative
@@ -7,6 +8,12 @@
 (define elt-bound (expt 10 12))
 
 (define size-bound 256)
+
+;; test-generative's scoping is very simple, so some test groups
+;; contain embedded loops.  Multiply this by test-generative's
+;; iteration count to get the number of times these embedded tests
+;; are run.
+(define embedded-trial-iterations 10)
 
 (define (random-nat-elt)
   (pseudo-random-integer elt-bound))
@@ -33,19 +40,12 @@
                (remove (lambda (p) (eqv? key (car p)))
                        (cdr ps)))))))
 
-;; Return the pair of ps with the least key.
-(define (alist-min ps)
-  (letrec
-   ((search
-     (lambda (ps least)
-       (cond ((null? ps) least)
-             ((< (caar ps) (car least)) (search (cdr ps) (car ps)))
-             (else (search (cdr ps) least))))))
-     (search (cdr ps) (car ps))))
-
 (define (make-random-wt-tree size)
   (alist->wt-tree number-wt-type
                   (make-random-nat-alist size)))
+
+(define (sort-num-alist ps)
+  (sort ps (lambda (p q) (< (car p) (car q)))))
 
 (test-group "Basic wt-trees"
   (test-assert (wt-tree/empty? (make-wt-tree number-wt-type)))
@@ -201,11 +201,13 @@
                n)))))
   )
 
-(test-group "min / delete-min"
+(test-group "index and rank"
   (test-generative ((size random-nonzero-size))
-    (let* ((ps (remove-key-dups (make-random-nat-alist size)))
+    (let* ((ps (sort-num-alist
+                (remove-key-dups
+                 (make-random-nat-alist size))))
            (t (alist->wt-tree number-wt-type ps))
-           (min-p (alist-min ps)))
+           (min-p (car ps)))
       (test "wt-tree/min" (car min-p) (wt-tree/min t))
       (test "wt-tree/min-datum" (cdr min-p) (wt-tree/min-datum t))
       (test "wt-tree/min-pair" min-p (wt-tree/min-pair t))
@@ -219,6 +221,40 @@
                      (or (= (car p) (car min-p)) ; min assoc deleted
                          (= (cdr p) (wt-tree/lookup t (car p) #f))))
                    ps))
+
+      (test "wt-tree/index"
+            'success
+            (let loop ((i 0) (k (pseudo-random-integer size)))
+              (cond ((> i embedded-trial-iterations) 'success)
+                    ((= (car (list-ref ps k)) (wt-tree/index t k))
+                     (loop (+ i 1) (pseudo-random-integer size)))
+                    (else 'failure))))
+
+      (test "wt-tree/index-datum"
+            'success
+            (let loop ((i 0) (k (pseudo-random-integer size)))
+              (cond ((> i embedded-trial-iterations) 'success)
+                    ((= (cdr (list-ref ps k)) (wt-tree/index-datum t k))
+                     (loop (+ i 1) (pseudo-random-integer size)))
+                    (else 'failure))))
+
+      (test "wt-tree/index-pair"
+            'success
+            (let loop ((i 0) (k (pseudo-random-integer size)))
+              (cond ((> i embedded-trial-iterations) 'success)
+                    ((equal? (list-ref ps k) (wt-tree/index-pair t k))
+                     (loop (+ i 1) (pseudo-random-integer size)))
+                    (else 'failure))))
+
+      (test "wt-tree/rank 1"
+            'success
+            (let loop ((i 0) (k (pseudo-random-integer size)))
+              (cond ((> i embedded-trial-iterations) 'success)
+                    ((= k (wt-tree/rank t (car (list-ref ps k))))
+                     (loop (+ i 1) (pseudo-random-integer size)))
+                    (else 'failure))))
+
+      (test "wt-tree/rank 2" #f (wt-tree/rank t (* size 2)))
   )))
 
 (test-group "destructive ops"
