@@ -1,0 +1,81 @@
+== slib.wt-tree
+
+This egg is a CHICKEN port of the {{(slib wt-tree)}} library.  It provides
+[[https://en.wikipedia.org/wiki/Weight-balanced_tree|weight-balanced trees]],
+a kind of self-balancing binary trees which are excellent for working with
+large collections of ordered-key/value-structured data.
+
+This egg is licensed under the GNU General Public License, version 2.
+
+[[toc:]]
+
+== Library
+
+A weight-balanced tree is a self-balancing binary search tree.  Abstractly,
+it is a dictionary, a set of associations between objects of a ''key'' type
+and of a ''value'' type.  In this implementation, all keys must be of the
+same type, but value types may differ within a single tree.
+
+Weight-balanced trees are an easy drop-in replacement for alists, basic
+binary trees, hash-tables, and other familiar dictionary structures.  Since
+they're also ordered by key, they can also be used to implement queues.
+
+=== Tree types
+
+{{wt-trees}} are constructed in two steps: First, you create a tree type,
+an object which holds key-type information, and second, you construct a new
+tree using this type object.  A few tree-types are built-in.
+
+<procedure>(make-wt-tree-type key<?) -> wt-tree-type</procedure>
+
+Returns a new tree type based on the ordering predicate ''key?'', which
+compares two key values and returns a boolean.  ''key?'' should be a
+total ordering; for all key values ''a'', ''b'', and ''c'', the following
+must hold:
+
+<enscript hilight="scheme">(key<? a a)  ; -> #f
+(and (key<? a b) (key<? b a))  ; -> #f
+(if (and (key<? a b) (key<? b c))
+    (key <? a c)
+    #t)
+ ; -> #t
+</enscript>
+
+Two wt-trees are compatible if their tree type objects are {{eqv?}}, so
+trees whose types result from different calls to {{make-wt-tree-type}}
+are always incompatible.
+
+<constant>number-wt-type</constant>
+
+A standard tree type for trees with numeric keys.
+
+<constant>string-wt-type</constant>
+
+A standard tree type for trees with string keys.
+
+=== Constructors
+
+<procedure>(make-wt-tree tree-type) -> wt-tree</procedure>
+
+Returns a new, empty weight-balanced tree specialized on ''tree-type''.
+
+<procedure>(singleton-wt-tree tree-type key value) -> wt-tree</procedure>
+
+Reterns a new weight-balanced tree with type ''tree-type'' and containing
+the single association (''key'', ''value'').
+
+Example:
+
+<enscript hilight="scheme">(singleton-wt-tree number-wt-type 1 2) ; -> wt-tree</enscript>
+
+<procedure>(alist->wt-tree tree-type alist) -> wt-tree</procedure>
+
+Returns a new weight-balanced tree with type ''tree-type'' and containing
+all the associations of ''alist''.
+
+Example:
+
+<enscript hilight="scheme">(alist->wt-tree number-wt-type '((1 . 2) (2 . 4)
+(3 . 6)))
+; -> wt-tree
+</enscript>
