@@ -8,4 +8,5 @@
  (components
   (extension
    slib.wt-tree
+   (csc-options "-O3" "-d1")
    (types-file))))
