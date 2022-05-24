@@ -221,4 +221,71 @@
                    ps))
   )))
 
+(test-group "destructive ops"
+  (test "wt-tree/add!"
+        23
+        (let ((t (alist->wt-tree number-wt-type
+                                 (make-random-nat-alist
+                                  (random-nonzero-size)))))
+          (wt-tree/add! t 10 23)
+          (wt-tree/lookup t 10 #f)))
+
+  (test "wt-tree/add! size delta"
+        1
+        (let* ((t (alist->wt-tree number-wt-type
+                                  (make-random-nat-alist
+                                   (random-nonzero-size))))
+               (old-size (wt-tree/size t)))
+          (wt-tree/add! t 10 23)
+          (- (wt-tree/size t) old-size)))
+
+  (test "wt-tree/delete! 1"
+        #t
+        (let ((t (alist->wt-tree number-wt-type '((10 . 23)))))
+          (wt-tree/delete! t 10)
+          (wt-tree/empty? t)))
+
+  (test "wt-tree/delete! 2"
+        #f
+        (let ((t (alist->wt-tree number-wt-type
+                                 (make-random-nat-alist
+                                  (random-nonzero-size)))))
+          (wt-tree/delete! t 10)
+          (wt-tree/member? 10 t)))
+
+  (test "wt-tree/delete! size delta"
+        1
+        (let* ((t-temp (alist->wt-tree number-wt-type
+                                       (make-random-nat-alist
+                                        (random-nonzero-size))))
+               (t (wt-tree/add t-temp 10 23))
+               (old-size (wt-tree/size t)))
+          (wt-tree/delete! t 10)
+          (- old-size (wt-tree/size t))))
+
+  (test "wt-tree/delete-min! 1"
+        #t
+        (let ((t (alist->wt-tree number-wt-type '((10 . 23)))))
+          (wt-tree/delete-min! t)
+          (wt-tree/empty? t)))
+
+  (test "wt-tree/delete-min! 2"
+        #f
+        (let* ((t (alist->wt-tree number-wt-type
+                                  (make-random-nat-alist
+                                   (random-nonzero-size))))
+               (min-key (wt-tree/min t)))
+          (wt-tree/delete-min! t)
+          (wt-tree/member? min-key t)))
+
+  (test "wt-tree/delete-min! size delta"
+        1
+        (let* ((t (alist->wt-tree number-wt-type
+                                  (make-random-nat-alist
+                                   (random-nonzero-size))))
+               (old-size (wt-tree/size t)))
+          (wt-tree/delete-min! t)
+          (- old-size (wt-tree/size t))))
+  )
+
 (test-exit)
