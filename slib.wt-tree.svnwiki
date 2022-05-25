@@ -272,7 +272,101 @@ time proportional to the size of ''tree''.
 Returns a new tree containing the associations of ''tree'' whose
 keys are less than/greater than ''bound''.  (O(log ''n''))
 
-=== Set theory
+=== Set theory operations
+
+<procedure>(wt-tree/union tree1 tree2) -> wt-tree</procedure>
+
+Returns a new tree containing all the associations from both ''tree1''
+and ''tree2''.  When both trees have an association for the same key,
+the returned tree contains the one from ''tree1''.
+
+The worst-case time required by this operation is proportional to the sum
+of the sizes of both trees.  If the minimum key of one tree is greater
+than the maximum key of the other tree then the time required is at
+worst proportional to the logarithm of the size of the larger tree.
+
+<procedure>(wt-tree/intersection tree1 tree2) -> wt-tree</procedure>
+
+Returns a new tree containing all and only those associations from
+''tree1'' which also have associations in ''tree2''.  All the
+associations in the result are drawn from ''tree1''.
+
+The time required by this operation is at worst proportional to
+the sum of the sizes of the trees.
+
+<procedure>(wt-tree/difference tree1 tree2) -> wt-tree</procedure>
+
+Returns a new tree containing all and only those associations from
+''tree1'' whose keys do not have an association in ''tree2''.
+
+The time required by this operation is at worst proportional to
+the sum of the sizes of the trees.
+
+<procedure>(wt-tree/subset? tree1 tree2) -> boolean</procedure>
+
+Returns {{#t}} if the key of each association in
+''tree1'' has an association in ''tree2'', and {{#f}}
+otherwise.  Note that {{wt-tree/subset?}} only compares keys.
+
+The time required by this operation is at worst proportional to
+the size of ''tree1''.
+
+<procedure>(wt-tree/set-equal? tree1 tree2) -> boolean</procedure>
+
+Returns {{#t}} if and only if the key of each association in
+''tree1'' has an association in ''tree2'', and vice-versa.
+Note that {{wt-tree/set-equal?}} only compares keys.
+
+<procedure>(wt-tree/union-merge tree1 tree2 combine) -> wt-tree</procedure>
+
+''combine'' is a procedure of three arguments returning a single
+value.
+
+Returns a new tree containing all the associations from both ''tree1''
+and ''tree2''.  When both trees have an association for the same key,
+''combine'' is applied to the key and to both associated values, in that
+order, and the result is associated with the key.
+
+Assuming that ''combine'' runs in O(1) time, the worst-case time required
+by this operation is proportional to the sum of the sizes of both trees.
+If the minimum key of one tree is greater than the maximum key of
+the other tree then the time required is at worst proportional to the
+logarithm of the size of the larger tree.
+
+Example:
+
+<enscript hilight="scheme">
+(let ((t1 (singleton-wt-tree number-wt-type 4 8))
+      (t2 (singleton-wt-tree number-wt-type 4 71)))
+  (wt-tree/lookup
+   (wt-tree/union-merge t1
+                        t2
+                        (lambda (_key v1 v2)
+                          (+ v1 v2)))
+   4
+   #f))
+; -> 79
+</enscript>
+
+=== Destructive operations
+
+All of the following procedures mutate their wt-tree argument and
+return an unspecified value.  They should be called for their effects
+alone.
+
+<procedure>(wt-tree/add! tree key value) -> unspecified</procedure>
+
+Associates ''key'' with ''value'' in ''tree''.  If ''tree'' already
+has an association for ''key'', then it is replaced.  (O(log ''n''))
+
+<procedure>(wt-tree/delete! tree key) -> unspecified</procedure>
+
+Deletes any association for ''key'' from ''tree''.  (O(log ''n''))
+
+<procedure>(wt-tree/delete-min! tree) -> unspecified</procedure>
+
+Deletes the association of ''tree'' with the least ''key'', in
+the sense of the tree's ordering predicate.  (O(log ''n''))
 
 == About this egg
 
