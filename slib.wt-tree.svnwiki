@@ -395,7 +395,8 @@ Contact: {{wcm at sigwinch dot xyzzy without the zy}}
 
 === Version history
 
-; 0.1 : (???) Initial release.
+; 0.1 : (2022-05-25) Initial release.
+; 0.1.1 : (2022-05-25) Fix missing dependency.
 
 === License
 
