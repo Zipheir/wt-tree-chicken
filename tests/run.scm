@@ -15,6 +15,8 @@
 ;; are run.
 (define embedded-trial-iterations 10)
 
+;;;; Helper procedures
+
 (define (random-nat-elt)
   (pseudo-random-integer elt-bound))
 
@@ -47,7 +49,9 @@
 (define (sort-num-alist ps)
   (sort ps (lambda (p q) (< (car p) (car q)))))
 
-(test-group "Basic wt-trees"
+;;;; Test groups
+
+(test-group "basic wt-trees"
   (test-assert (wt-tree/empty? (make-wt-tree number-wt-type)))
 
   (test-generative ((tree (lambda () (make-random-wt-tree 10))))
@@ -93,7 +97,7 @@
                               'frob)))))
   )
 
-(test-group "Advanced wt-trees"
+(test-group "advanced wt-trees"
   (test-generative ((ps (lambda () (make-random-nat-alist size-bound)))
                     (x random-nat-elt))
     (let ((tree (alist->wt-tree number-wt-type ps)))
