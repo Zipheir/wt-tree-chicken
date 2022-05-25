@@ -370,6 +370,10 @@ the sense of the tree's ordering predicate.  (O(log ''n''))
 
 == About this egg
 
+=== Dependencies
+
+The [[typed-records]] egg is required.
+
 === Author
 
 Stephen Adams.

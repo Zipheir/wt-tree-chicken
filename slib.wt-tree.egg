@@ -4,6 +4,7 @@
  (version "0.1")
  (category data)
  (license "GPLv2")
+ (dependencies typed-records)
  (test-dependencies test test-generative srfi-1)
  (components
   (extension
