@@ -104,7 +104,7 @@ Example:
   (wt-tree/lookup t 5 #f))  ; -> 10
 </enscript>
 
-<procedure>(wt-tree/delete tree key) -> wt-tree)</procedure>
+<procedure>(wt-tree/delete tree key) -> wt-tree</procedure>
 
 Returns a new tree containing all the associations of ''tree'' except
 for the association for ''key'', if one exists.  (O(log ''n''))
