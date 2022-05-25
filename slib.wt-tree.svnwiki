@@ -20,6 +20,10 @@ Weight-balanced trees are an easy drop-in replacement for alists, basic
 binary trees, hash-tables, and other familiar dictionary structures.  Since
 they're also ordered by key, they can also be used to implement queues.
 
+Weight-balanced tree operations marked "O(log ''n'')" in this document run
+in time proportional to the logarithm of the number of associations in the
+given tree.
+
 === Tree types
 
 {{wt-trees}} are constructed in two steps: First, you create a tree type,
@@ -44,6 +48,10 @@ must hold:
 Two wt-trees are compatible if their tree type objects are {{eqv?}}, so
 trees whose types result from different calls to {{make-wt-tree-type}}
 are always incompatible.
+
+<procedure>(wt-tree-type? obj) -> boolean</procedure>
+
+Returns {{#t}} if ''obj'' is a tree type object and {{#f}} otherwise.
 
 <constant>number-wt-type</constant>
 
@@ -78,4 +86,78 @@ Example:
 <enscript hilight="scheme">(alist->wt-tree number-wt-type '((1 . 2) (2 . 4)
 (3 . 6)))
 ; -> wt-tree
+</enscript>
+
+<procedure>(wt-tree/add tree key value) -> wt-tree</procedure>
+
+Returns a new tree containing all the associations of ''tree'' as well
+as the association (''key'', ''value'').  Any existing association for
+''key'' is replaced.  (O(log ''n''))
+
+Example:
+
+<enscript hilight="scheme">
+(let ((t (wt-tree/add (alist->wt-tree number-wt-type
+                                      '((1 . 2) (2 . 4)))
+                      5
+                      10)))
+  (wt-tree/lookup t 5 #f))  ; -> 10
+</enscript>
+
+<procedure>(wt-tree/delete tree key) -> wt-tree)</procedure>
+
+Returns a new tree containing all the associations of ''tree'' except
+for the association for ''key'', if one exists.  (O(log ''n''))
+
+=== Predicates
+
+<procedure>(wt-tree? obj) -> boolean</procedure>
+
+Returns {{#t}} if ''obj'' is a weight-balanced tree and {{#f}}
+otherwise.
+
+<procedure>(wt-tree/empty? tree) -> boolean</procedure>
+
+Returns {{#t}} if ''tree'' contains no associations and {{#f}}
+otherwise.
+
+=== Accessors
+
+<procedure>(wt-tree/member? key tree) -> boolean</procedure>
+
+Returns {{#t}} if ''tree'' contains an association for ''key'' and
+{{#f}} otherwise.  (O(log ''n''))
+
+<procedure>(wt-tree/lookup tree key default) -> * or #f</procedure>
+
+Returns the value associated with ''key'' in ''tree'', or ''default''
+(which can be any Scheme value) if there is no such association.
+(O(log ''n''))
+
+<procedure>(wt-tree/index tree k) -> *</procedure>
+<procedure>(wt-tree/index-datum tree k) -> *</procedure>
+<procedure>(wt-tree/index-pair tree k) -> pair(*, *)</procedure>
+
+''tree'' must be non-empty, and ''k'' must be a positive exact
+integer.
+
+Returns the 0-based ''k''th association of ''tree'' in the sorted
+sequence of keys.  {{wt-tree/index}} returns the ''k''th key,
+{{wt-tree/index-datum}} returns the value associated with the
+''k''th key, and {{wt-tree/index-pair}} returns the ''k''th
+association as a {{(KEY . VALUE)}} pair.
+If ''k'' ≥ {{(wt-tree/size tree)}}, an error is signalled.
+(O(log ''n''))
+
+Example:
+
+<enscript hilight="scheme">
+(let ((t (alist->wt-tree string-wt-type
+                         '(("rincewind" . 23)
+                           ("twoflower" . 11)
+                           ("the luggage" . 31)))))
+  (list (wt-tree/index t 1)
+        (wt-tree/index-datum t 0)
+        (wt-tree/index-pair t 2)))
+; -> ("the luggage" 23 ("twoflower" . 11))
 </enscript>
