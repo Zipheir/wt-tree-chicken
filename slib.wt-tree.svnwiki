@@ -109,6 +109,14 @@ Example:
 Returns a new tree containing all the associations of ''tree'' except
 for the association for ''key'', if one exists.  (O(log ''n''))
 
+<procedure>(wt-tree/delete-min tree key) -> wt-tree</procedure>
+
+''tree'' must not be empty.
+
+Returns a new tree containing all the associations of ''tree'' except
+the one with the least key in the sorted sequence of keys.
+(O(log ''n''))
+
 === Predicates
 
 <procedure>(wt-tree? obj) -> boolean</procedure>
@@ -120,6 +128,12 @@ otherwise.
 
 Returns {{#t}} if ''tree'' contains no associations and {{#f}}
 otherwise.
+
+=== Size
+
+<procedure>(wt-tree/size tree) -> integer</procedure>
+
+Returns the number of associations in ''tree''.
 
 === Accessors
 
@@ -138,7 +152,7 @@ Returns the value associated with ''key'' in ''tree'', or ''default''
 <procedure>(wt-tree/index-datum tree k) -> *</procedure>
 <procedure>(wt-tree/index-pair tree k) -> pair(*, *)</procedure>
 
-''tree'' must be non-empty, and ''k'' must be a positive exact
+''tree'' must not be empty, and ''k'' must be a positive exact
 integer.
 
 Returns the 0-based ''k''th association of ''tree'' in the sorted
@@ -161,3 +175,127 @@ Example:
         (wt-tree/index-pair t 2)))
 ; -> ("the luggage" 23 ("twoflower" . 11))
 </enscript>
+
+<procedure>(wt-tree/min tree) -> *</procedure>
+<procedure>(wt-tree/min-datum tree) -> *</procedure>
+<procedure>(wt-tree/min-pair tree) -> pair(*, *)</procedure>
+
+''tree'' must not be empty.
+
+Returns the association of ''tree'' with the least key in the
+sorted sequence of keys.  {{wt-tree/min}} returns the least key,
+{{wt-tree/min-datum}} returns the value associated with the
+least key, and {{wt-tree/min-pair}} returns the least
+association as a {{(KEY . VALUE)}} pair.  (O(log ''n''))
+
+{{(wt-tree/min tree)}} is equivalent to {{(wt-tree/index tree 0)}},
+and similarly for the other forms.
+
+<enscript hilight="scheme">
+(let ((t (alist->wt-tree string-wt-type
+                         '(("rincewind" . 23)
+                           ("twoflower" . 11)
+                           ("the luggage" . 31)))))
+  (list (wt-tree/min t)
+        (wt-tree/min-datum t)))
+; -> ("rincewind" 23)
+</enscript>
+
+<procedure>(wt-tree/rank tree key) -> integer or #f</procedure>
+
+Returns the 0-based position of ''key'' in the sorted sequence of
+keys of ''tree''.  If ''key'' has no association in ''tree'', then
+{{#f}} is returned instead.
+
+<enscript hilight="scheme">
+(let ((t (alist->wt-tree string-wt-type
+                         '(("rincewind" . 23)
+                           ("twoflower" . 11)
+                           ("the luggage" . 31)))))
+  (wt-tree/rank "twoflower"))
+; -> 1
+</enscript>
+
+=== Iteration
+
+<procedure>(wt-tree/fold kons knil tree) -> *</procedure>
+
+Folds ''tree'', applying ''kons'' to the key, value, and the
+accumulated result, in that order, at each step.  ''knil'' is
+passed to ''kons'' as the initial accumulator value.  ''tree''
+is traversed in reverse order.
+
+Provided ''kons'' runs in O(1) time, {{wt-tree/fold}} takes
+time proportional to the size of ''tree''.
+
+Example:
+
+<enscript hilight="scheme">
+(let ((t (alist->wt-tree string-wt-type
+                         '(("rincewind" . 23)
+                           ("twoflower" . 11)
+                           ("the luggage" . 31)))))
+  (list (wt-tree/fold (lambda (_k v sum) (+ v sum)) 0 t)
+        (wt-tree/fold (lambda (k _v keys) (cons k keys))
+                      '()
+                      t)))
+; -> (65 ("rincewind" "the luggage" "twoflower"))
+</enscript>
+
+<procedure>(wt-tree/for-each proc tree) -> unspecified</procedure>
+
+Traverses ''tree'' in increasing order of key, applying ''proc'' to
+the key and value of each association.  Any values returned by ''proc''
+are ignored.
+
+Provided ''proc'' runs in O(1) time, {{wt-tree/for-each}} takes
+time proportional to the size of ''tree''.
+
+<enscript hilight="scheme">
+(let ((t (alist->wt-tree string-wt-type
+                         '(("rincewind" . 23)
+                           ("twoflower" . 11)
+                           ("the luggage" . 31))))
+      (acc 0))
+  (wt-tree/for-each (lambda (_k v)
+                      (set! acc (+ v acc)))
+                    t)
+  acc)
+; -> 65
+</enscript>
+
+=== Subtrees
+
+<procedure>(wt-tree/split< tree bound) -> wt-tree</procedure>
+<procedure>(wt-tree/split> tree bound) -> wt-tree</procedure>
+
+Returns a new tree containing the associations of ''tree'' whose
+keys are less than/greater than ''bound''.  (O(log ''n''))
+
+=== Set theory
+
+== About this egg
+
+=== Author
+
+Stephen Adams.
+
+Ported to CHICKEN 5 and edited by Wolfgang Corcoran-Mathe.
+
+=== Maintainer
+
+Wolfgang Corcoran-Mathe
+
+Contact: {{wcm at sigwinch dot xyzzy without the zy}}
+
+=== Repository
+
+[[https://github.com/Zipheir/wt-tree-chicken|GitHub]]
+
+=== Version history
+
+; 0.1 : (???) Initial release.
+
+=== License
+
+[[https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt|GNU GPL version 2]]
