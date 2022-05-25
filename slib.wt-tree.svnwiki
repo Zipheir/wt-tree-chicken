@@ -374,6 +374,9 @@ the sense of the tree's ordering predicate.  (O(log ''n''))
 
 The [[typed-records]] egg is required.
 
+To run the included tests, you'll also need the [[test]] and
+[[test-generative]] eggs.
+
 === Author
 
 Stephen Adams.
