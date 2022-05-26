@@ -1,6 +1,8 @@
 (repo git "https://github.com/Zipheir/wt-tree-chicken.git")
 
 (uri targz "https://codeload.github.com/Zipheir/wt-tree-chicken/tar.gz/{egg-release}")
+(release "0.1.4")
+(release "0.1.3")
 (release "0.1.2")
 (release "0.1.1")
 (release "0.1")
