@@ -397,6 +397,7 @@ Contact: {{wcm at sigwinch dot xyzzy without the zy}}
 
 ; 0.1 : (2022-05-25) Initial release.
 ; 0.1.1 : (2022-05-25) Fix missing dependency.
+; 0.1.2 : (2022-05-25) Rename egg to make Henrietta happy.
 
 === License
 
