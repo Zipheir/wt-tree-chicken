@@ -1,4 +1,4 @@
-# (slib wt-tree)
+# slib-wt-tree
 
 This is a port of the weight-balanced tree library used by
 MIT Scheme to CHICKEN 5 Scheme.

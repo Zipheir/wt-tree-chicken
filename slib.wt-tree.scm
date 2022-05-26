@@ -1,4 +1,4 @@
-(module (slib wt-tree)
+(module slib-wt-tree
   (make-wt-tree-type
    wt-tree-type?
    number-wt-type

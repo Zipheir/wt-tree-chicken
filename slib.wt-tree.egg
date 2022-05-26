@@ -8,6 +8,6 @@
  (test-dependencies test test-generative srfi-1)
  (components
   (extension
-   slib.wt-tree
+   slib-wt-tree
    (csc-options "-O3" "-d1")
    (types-file))))

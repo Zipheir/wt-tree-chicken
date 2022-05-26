@@ -1,4 +1,4 @@
-== slib.wt-tree
+== slib-wt-tree
 
 This egg is a CHICKEN port of the {{(slib wt-tree)}} library.  It provides
 [[https://en.wikipedia.org/wiki/Weight-balanced_tree|weight-balanced trees]],
