@@ -3,7 +3,7 @@
         (srfi 1)
         test
         test-generative
-        slib-wt-tree)
+        (slib wt-tree))
 
 (define elt-bound (expt 10 12))
 
