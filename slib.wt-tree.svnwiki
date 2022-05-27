@@ -395,12 +395,9 @@ Contact: {{wcm at sigwinch dot xyzzy without the zy}}
 
 === Version history
 
-; 0.1 : (2022-05-25) Initial release.
-; 0.1.1 : (2022-05-25) Fix missing dependency.
-; 0.1.2 : (2022-05-25) Rename egg to make Henrietta happy.
-; 0.1.3 : (2022-05-25) Fix test import.
-; 0.1.4 : (2022-05-25) Revert renaming, keep the dot, just rename the egg file.
-; 0.1.5 : (2022-05-26) Fix test import, again.
+Versions before 0.1.5 were bookkeeping fixes.
+
+; 0.1.5 : (2022-05-26) Initial release.
 
 === License
 
