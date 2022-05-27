@@ -1,9 +1,13 @@
-== slib.wt-tree
+== slib-wt-tree
 
 This egg is a CHICKEN port of the {{(slib wt-tree)}} library.  It provides
 [[https://en.wikipedia.org/wiki/Weight-balanced_tree|weight-balanced trees]],
 a kind of self-balancing binary trees which are excellent for working with
 large collections of ordered-key/value-structured data.
+
+While the name of this egg is {{slib-wt-tree}}, the module it provides
+is {{(slib wt-tree)}}.  This difference is due to the names allowed by
+the Henrietta egg server.
 
 This egg is licensed under the GNU General Public License, version 2.
 
