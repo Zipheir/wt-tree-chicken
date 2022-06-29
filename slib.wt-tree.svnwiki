@@ -146,7 +146,7 @@ Returns the number of associations in ''tree''.
 Returns {{#t}} if ''tree'' contains an association for ''key'' and
 {{#f}} otherwise.  (O(log ''n''))
 
-<procedure>(wt-tree/lookup tree key default) -> * or #f</procedure>
+<procedure>(wt-tree/lookup tree key default) -> *</procedure>
 
 Returns the value associated with ''key'' in ''tree'', or ''default''
 (which can be any Scheme value) if there is no such association.
