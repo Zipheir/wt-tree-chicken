@@ -53,6 +53,40 @@
 ;;
 ;;(declare (usual-integrations))
 
+;;; Utility
+
+(: exact-natural? (* -> boolean))
+(define (exact-natural? x)
+  (and (exact-integer? x) (not (negative? x))))
+
+;;; Conditions and exceptions
+
+(define (make-type-condition loc msg . args)
+  (make-composite-condition
+   (make-property-condition 'exn
+    'location loc
+    'message msg
+    'arguments args)
+   (make-property-condition 'type)))
+
+(define (make-bounds-condition loc msg . args)
+  (make-composite-condition
+   (make-property-condition 'exn
+    'location loc
+    'message msg
+    'arguments args)
+   (make-property-condition 'bounds)))
+
+(define-syntax assert-type
+  (syntax-rules ()
+    ((assert-type loc expr . args)
+     (unless expr
+       (abort
+        (make-type-condition loc
+                             "assertion violation: type check failed"
+                             'expr
+                             . args))))))
+
 ;;;
 ;;; Interface to this package.
 ;;;
@@ -255,7 +289,10 @@
     (if (or (< index 0)
             (>= index bound)
             (not (fix:fixnum? index)))
-      (error 'node/index "bad range argument" index)
+      (abort
+       (make-bounds-condition 'node/index
+                              "argument out of bounds"
+                              index))
       (loop node index))))
 
 (define (error:empty owner)
@@ -467,7 +504,10 @@
             ((pair? alist)  (loop (cdr alist)
                                   (node/add node (caar alist) (cdar alist))))
             (else
-              (error 'alist->tree "wrong type argument" alist))))
+              (abort
+               (make-type-condition 'alist->tree
+                                    "wrong type argument"
+                                    alist)))))
     (%make-wt-tree my-type (loop alist empty)))
 
   (define (tree/get tree key default)
@@ -511,18 +551,12 @@
 (define-syntax guarantee-tree
   (syntax-rules ()
     ((guarantee-tree tree procedure)
-     (assert (wt-tree? tree)
-             "wrong type argument"
-             tree
-             procedure))))
+     (assert-type procedure (wt-tree? tree) tree))))
 
 (define-syntax guarantee-tree-type
   (syntax-rules ()
     ((guarantee-tree-type type procedure)
-     (assert (wt-tree-type? type)
-             "wrong type argument"
-             type
-             procedure))))
+     (assert-type procedure (wt-tree-type? type) type))))
 
 (define-syntax guarantee-compatible-trees
   (syntax-rules ()
@@ -530,12 +564,14 @@
      (begin
       (guarantee-tree tree1 procedure)
       (guarantee-tree tree2 procedure)
-      (assert (eq? (tree/type tree1) (tree/type tree2))
-              "trees have incompatible types"
-              tree1
-              tree2
-              (tree/type tree1)
-              (tree/type tree2))))))
+      (unless (eq? (tree/type tree1) (tree/type tree2))
+        (abort
+         (make-type-condition procedure
+                              "trees have incompatible types"
+                              tree1
+                              tree2
+                              (tree/type tree1)
+                              (tree/type tree2))))))))
 
 (define (valid? tree)
   (let ((root (tree/root tree)))
@@ -586,6 +622,8 @@
 (define alist->wt-tree
   (lambda (type alist)
     (guarantee-tree-type type 'alist->wt-tree)
+    (assert-type 'alist->wt-tree
+                 (or (pair? alist) (null? alist)))
     ((tree-type/alist->tree type) alist)))
 
 (: wt-tree/empty? (wt-tree -> boolean))
@@ -688,6 +726,7 @@
 (define wt-tree/fold
   (lambda (combiner-key-datum-result init tree)
     (guarantee-tree tree 'wt-tree/fold)
+    (assert-type 'wt-tree/fold (procedure? combiner-key-datum-result))
     (node/inorder-fold combiner-key-datum-result
                        init
                        (tree/root tree))))
@@ -696,12 +735,14 @@
 (define wt-tree/for-each
   (lambda (action-key-datum tree)
     (guarantee-tree tree 'wt-tree/for-each)
+    (assert-type 'wt-tree/for-each (procedure? action-key-datum))
     (node/for-each action-key-datum (tree/root tree))))
 
 (: wt-tree/index (wt-tree integer -> *))
 (define wt-tree/index
   (lambda (tree index)
     (guarantee-tree tree 'wt-tree/index)
+    (assert-type 'wt-tree/index (exact-natural? index))
     (let ((node  (node/index (tree/root tree) index)))
       (and node (node/k node)))))
 
@@ -709,6 +750,7 @@
 (define wt-tree/index-datum
   (lambda (tree index)
     (guarantee-tree tree 'wt-tree/index-datum)
+    (assert-type 'wt-tree/index-datum (exact-natural? index))
     (let ((node  (node/index (tree/root tree) index)))
       (and node (node/v node)))))
 
@@ -716,6 +758,7 @@
 (define wt-tree/index-pair
   (lambda (tree index)
     (guarantee-tree tree 'wt-tree/index-pair)
+    (assert-type 'wt-tree/index-pair (exact-natural? index))
     (let ((node  (node/index (tree/root tree) index)))
       (and node (cons (node/k node) (node/v node))))))
 

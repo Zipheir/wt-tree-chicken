@@ -38,10 +38,37 @@
 
   (import scheme
           (chicken base)
+          (chicken condition)
           (chicken fixnum)
           (chicken type)
           typed-records
           )
+
+  (define (make-type-condition loc msg . args)
+    (make-composite-condition
+     (make-property-condition 'exn
+      'location loc
+      'message msg
+      'arguments args)
+     (make-property-condition 'type)))
+
+  (define (make-bounds-condition loc msg . args)
+    (make-composite-condition
+     (make-property-condition 'exn
+      'location loc
+      'message msg
+      'arguments args)
+     (make-property-condition 'bounds)))
+
+  (define-syntax assert-type
+    (syntax-rules ()
+      ((assert-type loc expr . args)
+       (unless expr
+         (abort
+          (make-type-condition loc
+                               "assertion violation: type check failed"
+                               'expr
+                               . args))))))
 
   (include "wt-tree-impl.scm")
   )
