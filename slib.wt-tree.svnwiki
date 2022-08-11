@@ -372,6 +372,13 @@ Deletes any association for ''key'' from ''tree''.  (O(log ''n''))
 Deletes the association of ''tree'' with the least ''key'', in
 the sense of the tree's ordering predicate.  (O(log ''n''))
 
+=== Exceptions
+
+Following CHICKEN's libraries, procedures from this egg abort with
+''(exn type)'' and ''(exn bounds)'' conditions when type- and
+bounds-checking assertions fail, respectively.  See the
+[[Module (chicken condition)]] page for more details.
+
 == About this egg
 
 === Dependencies
