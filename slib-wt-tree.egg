@@ -1,7 +1,7 @@
 ((author "Stephen Adams")
  (maintainer "Wolfgang Corcoran-Mathe")
  (synopsis "Weight-balanced trees")
- (version "0.1")
+ (version "0.1.6")
  (category data)
  (license "GPLv2")
  (dependencies typed-records)

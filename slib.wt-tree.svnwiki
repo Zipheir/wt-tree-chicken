@@ -409,6 +409,7 @@ Contact: {{wcm at sigwinch dot xyzzy without the zy}}
 Versions before 0.1.5 were bookkeeping fixes.
 
 ; 0.1.5 : (2022-05-26) Initial release.
+; 0.1.6 : (2022-08-11) Rework exceptions, add more checks.
 
 === License
 
