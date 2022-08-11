@@ -375,7 +375,7 @@ the sense of the tree's ordering predicate.  (O(log ''n''))
 === Exceptions
 
 Following CHICKEN's libraries, procedures from this egg abort with
-''(exn type)'' and ''(exn bounds)'' conditions when type- and
+{{(exn type)}} and {{(exn bounds)}} conditions when type- and
 bounds-checking assertions fail, respectively.  See the
 [[Module (chicken condition)]] page for more details.
 
